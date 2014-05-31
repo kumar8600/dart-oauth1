@@ -157,7 +157,7 @@ abstract class OAuth1Utils {
     });
     request.send(data);
 
-    return completer;
+    return completer.future;
   }
 
   /**
