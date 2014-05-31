@@ -1,0 +1,5 @@
+name: oauth1
+description: A pub package
+dependencies:
+  crypto: any
+  uuid: any
