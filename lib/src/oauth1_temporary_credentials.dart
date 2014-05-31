@@ -14,4 +14,8 @@ class OAuth1TemporaryCredentials implements OAuth1AbstractCredentials {
 
   String get token => _token;
   String get tokenSecret => _tokenSecret;
+
+  String toString() {
+    return 'oauth_token=$token&oauth_token_secret=$tokenSecret';
+  }
 }

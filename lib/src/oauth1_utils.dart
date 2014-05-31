@@ -167,8 +167,8 @@ abstract class OAuth1Utils {
   static Map<String, String> _parseResponseParameters(String response) {
     Map<String, String> result = new HashMap();
     response.split('&').forEach((p) {
-      var keyValue = p.split('=').map(Uri.encodeComponent);
-      result[keyValue[0]] = keyValue.length > 1 ? keyValue[1] : null;
+      Iterable keyValue = p.split('=').map(Uri.encodeComponent);
+      result[keyValue.first] = keyValue.length > 1 ? keyValue.elementAt(1) : "";
     });
     return result;
   }

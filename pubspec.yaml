@@ -1,4 +1,5 @@
 name: oauth1
+version: 0.0.2
 description: A pub package
 dependencies:
   crypto: any
