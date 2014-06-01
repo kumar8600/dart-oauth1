@@ -100,7 +100,7 @@ class Authorization {
   static Map<String, String> _parseResponseParameters(String response) {
     Map<String, String> result = new Map<String, String>();
     response.split('&').forEach((p) {
-      Iterable keyValue = p.split('=').map(Uri.encodeComponent);
+      Iterable keyValue = p.split('=');
       result[keyValue.first] = keyValue.length > 1 ? keyValue.elementAt(1) : "";
     });
     return result;

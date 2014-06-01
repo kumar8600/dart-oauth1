@@ -1,13 +1,18 @@
 library utils;
 
-abstract class OAuth1Utils {
+import 'platform.dart';
+import 'signature_method.dart';
 
+class Twitter extends AbstractPlatform {
+  /// Temporary Credentials Request URI
+  String get temporaryCredentialsRequestURI => 'https://api.twitter.com/oauth/request_token';
 
-  /**
-   * Return new Map object removed elements that have key equals keys elements from map.
-   */
-  static Map _differenceMapKeys(Map map, List keys) {
-    Set keysDifference = map.keys.toSet().difference(keys.toSet());
-    return new Map.fromIterable(keysDifference, value: (item) => map[item]);
-  }
+  /// Resource Owner Authorization URI
+  String get resourceOwnerAuthorizationURI => 'https://api.twitter.com/oauth/authorize';
+
+  /// Token Credentials Request URI
+  String get tokenCredentialsRequestURI => 'https://api.twitter.com/oauth/access_token';
+
+  /// Signature Method
+  SignatureMethod get signatureMethod => new HMAC_SHA1();
 }

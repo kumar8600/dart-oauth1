@@ -41,7 +41,7 @@ class AuthorizationHeader {
   String toString() {
     Map<String, String> params = new Map();
 
-    params['oauth_nonce'] = _uuid.v1();
+    params['oauth_nonce'] = new DateTime.now().millisecondsSinceEpoch.toString();
     params['oauth_signature_method'] = _signatureMethod.name;
     params['oauth_timestamp'] = (new DateTime.now().millisecondsSinceEpoch / 1000).floor().toString();
     params['oauth_consumer_key'] = _clientCredentials.token;
@@ -80,6 +80,7 @@ class AuthorizationHeader {
     params.forEach((k, v) {
       encodedParams[Uri.encodeComponent(k)] = Uri.encodeComponent(v);
     });
+    params.remove("realm");
 
     // 2. Sort the list of parameters alphabetically[1]
     //    by encoded key[2].
@@ -126,13 +127,13 @@ class AuthorizationHeader {
     // secret, followed by an ampersand character '&',
     // followed by the percent encoded token secret:
     String consumerSecret = Uri.encodeComponent(_clientCredentials.tokenSecret);
-    String tokenSecret = _credentials.tokenSecret != null ? Uri.encodeComponent(_credentials.tokenSecret) : "";
+    String tokenSecret = _credentials != null ? Uri.encodeComponent(_credentials.tokenSecret) : "";
     String signingKey = "$consumerSecret&$tokenSecret";
 
     //
     // Calculating the signature
     //
-    return _signatureMethod.sign(base.toString(), signingKey);
+    return _signatureMethod.sign(signingKey, base.toString());
   }
 
 }
