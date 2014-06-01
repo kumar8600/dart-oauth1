@@ -1,6 +1,8 @@
 name: oauth1
-version: 0.0.2
-description: A pub package
+version: 0.0.9
+description: A pub package of OAuth 1.0 (RFC 5849) library.
 dependencies:
   crypto: any
+  http: any
+  unittest: any
   uuid: any
