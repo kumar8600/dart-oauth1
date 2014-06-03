@@ -1,25 +1,33 @@
 library signature_method;
 
 import 'package:crypto/crypto.dart';
-import 'package:cipher/cipher.dart' as cipher;
+
+typedef String Sign(String key, String text);
 
 /**
- * A abstract class abstracting Signature Method.
+ * A class abstracting Signature Method.
  * http://tools.ietf.org/html/rfc5849#section-3.4
  */
-abstract class SignatureMethod {
+class SignatureMethod {
+  final String _name;
+  final Sign _sign;
+
+  /// A constructor of SignatureMethod.
+  SignatureMethod(this._name, this._sign);
+
   /// Signature Method Name
-  String get name;
+  String get name => _name;
 
   /// Sign data by key.
-  String sign(String key, String text);
+  String sign(String key, String text) => _sign(key, text);
 }
 
-/// http://tools.ietf.org/html/rfc5849#section-3.4.2
-class HMAC_SHA1 extends SignatureMethod {
-  String get name => "HMAC-SHA1";
-
-  String sign(String key, String text) {
+/**
+ * A abstract class contains Signature Methods.
+ */
+abstract class SignatureMethods {
+  /// http://tools.ietf.org/html/rfc5849#section-3.4.2
+  static final SignatureMethod HMAC_SHA1 = new SignatureMethod("HMAC-SHA1", (key, text) {
     HMAC hmac = new HMAC(new SHA1(), key.codeUnits);
     hmac.add(text.codeUnits);
 
@@ -27,23 +35,13 @@ class HMAC_SHA1 extends SignatureMethod {
     // string. This needs to be base64 encoded to produce
     // the signature string.
     return CryptoUtils.bytesToBase64(hmac.close());
-  }
-}
+  });
 
-/// http://tools.ietf.org/html/rfc5849#section-3.4.3
-/// TODO: Implement RSA-SHA1
-//class RSA_SHA1 extends SignatureMethod {
-//  String get name => "RSA-SHA1";
-//
-//  String sign(String key, String text) {
-//  }
-//}
+  /// http://tools.ietf.org/html/rfc5849#section-3.4.3
+  /// TODO: Implement RSA-SHA1
 
-/// http://tools.ietf.org/html/rfc5849#section-3.4.4
-class PLAINTEXT extends SignatureMethod {
-  String get name => "PLAINTEXT";
-
-  String sign(String key, String text) {
+  /// http://tools.ietf.org/html/rfc5849#section-3.4.4
+  static final SignatureMethod PLAINTEXT = new SignatureMethod("PLAINTEXT", (key, text) {
     return key;
-  }
+  });
 }

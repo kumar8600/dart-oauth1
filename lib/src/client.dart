@@ -1,7 +1,6 @@
 library oauth1_client;
 
 import 'dart:async';
-import 'package:http/browser_client.dart';
 import 'package:http/http.dart' as http;
 
 import 'signature_method.dart';
@@ -21,17 +20,16 @@ class Client extends http.BaseClient {
   final Credentials _credentials;
   final http.BaseClient _httpClient;
 
-  /// A constructor of Client.
-  Client(this._signatureMethod, this._clientCredentials, this._credentials, this._httpClient);
+  /**
+   * A constructor of Client.
+   *
+   * If you want to use in web browser, pass http.BrowserClient object for httpClient.
+   * https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/http/http-browser_client.BrowserClient
+   */
+  Client(this._signatureMethod, this._clientCredentials, this._credentials, [http.BaseClient httpClient]) :
+    _httpClient = httpClient != null ? httpClient : new http.Client();
 
-  /// A named constructor of Client using dart:io for http requests.
-  Client.forClient(this._signatureMethod, this._clientCredentials, this._credentials) :
-    _httpClient = new http.Client();
-
-  /// A named constructor of Client using dart:html for http requests.
-  Client.forBrowser(this._signatureMethod, this._clientCredentials, this._credentials) :
-    _httpClient = new BrowserClient();
-
+  @override
   Future<http.StreamedResponse> send(http.BaseRequest request) {
     var ahb = new AuthorizationHeaderBuilder();
     ahb.signatureMethod = _signatureMethod;

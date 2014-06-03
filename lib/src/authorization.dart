@@ -1,34 +1,35 @@
 library authorization;
 
 import 'dart:async';
-import 'package:http/browser_client.dart';
 import 'package:http/http.dart' as http;
+import 'package:formler/formler.dart';
 
 import 'credentials.dart';
 import 'client_credentials.dart';
 import 'platform.dart';
 import 'authorization_header_builder.dart';
+import 'authorization_response.dart';
 
 /**
  * A proxy class describing OAuth 1.0 redirection-based authorization.
  * http://tools.ietf.org/html/rfc5849#section-2
  *
- * Redirection works are belonged to client.
+ * Redirection works are responded to client.
  * So you can do PIN-based authorization too if you want.
  */
 class Authorization {
   final ClientCredentials _clientCredentials;
-  final AbstractPlatform _platform;
+  final Platform _platform;
   final http.BaseClient _httpClient;
 
-  /// A constructor of Authorization.
-  Authorization(this._clientCredentials, this._platform, this._httpClient);
-
-  /// A named constructor of Authorization using dart:io for http requests.
-  Authorization.forClient(this._clientCredentials, this._platform) : _httpClient = new http.Client();
-
-  /// A named constructor of Authorization using dart:html for http requests.
-  Authorization.forBrowser(this._clientCredentials, this._platform) : _httpClient = new BrowserClient();
+  /**
+   * A constructor of Authorization.
+   *
+   * If you want to use in web browser, pass http.BrowserClient object for httpClient.
+   * https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/http/http-browser_client.BrowserClient
+   */
+  Authorization(this._clientCredentials, this._platform, [http.BaseClient httpClient]) :
+    _httpClient = httpClient != null ? httpClient : new http.Client();
 
   /**
    * Obtain a set of temporary credentials from the server.
@@ -36,7 +37,7 @@ class Authorization {
    *
    * If not callbackURI passed, authentication becomes PIN-based.
    */
-  Future<Credentials> requestTemporaryCredentials([String callbackURI]) {
+  Future<AuthorizationResponse> requestTemporaryCredentials([String callbackURI]) {
     if (callbackURI == null) {
       callbackURI = 'oob';
     }
@@ -53,11 +54,14 @@ class Authorization {
     return _httpClient.post(_platform.temporaryCredentialsRequestURI, headers: {
       'Authorization': ahb.build().toString()
     }).then((res) {
-      Map<String, String> params = _parseResponseParameters(res.body);
+      if ((res as http.Response).statusCode != 200) {
+        throw new StateError(res.body);
+      }
+      Map<String, String> params = Formler.parseUrlEncoded(res.body);
       if (params['oauth_callback_confirmed'].toLowerCase() != 'true') {
         throw new StateError("oauth_callback_confirmed must be true");
       }
-      return new Credentials(params['oauth_token'], params['oauth_token_secret']);
+      return new AuthorizationResponse.fromMap(params);
     });
   }
 
@@ -73,36 +77,26 @@ class Authorization {
    * Obtain a set of token credentials from the server.
    * http://tools.ietf.org/html/rfc5849#section-2.3
    */
-  Future<Credentials> requestTokenCredentials(Credentials temporaryCredentials, String verifier) {
+  Future<AuthorizationResponse> requestTokenCredentials(Credentials tokenCredentials, String verifier) {
     Map additionalParams = {
       'oauth_verifier': verifier
     };
     var ahb = new AuthorizationHeaderBuilder();
     ahb.signatureMethod = _platform.signatureMethod;
     ahb.clientCredentials = _clientCredentials;
-    ahb.credentials = temporaryCredentials;
-    ahb.method = 'POST';
+    ahb.credentials = tokenCredentials;
+    ahb.method = 'POS';
     ahb.url = _platform.tokenCredentialsRequestURI;
     ahb.additionalParameters = additionalParams;
 
-    return _httpClient.post(_platform.temporaryCredentialsRequestURI, headers: {
+    return _httpClient.post(_platform.tokenCredentialsRequestURI, headers: {
       'Authorization': ahb.build().toString()
     }).then((res) {
-      Map<String, String> params = _parseResponseParameters(res.body);
-      return new Credentials(params['oauth_token'], params['oauth_token_secret']);
+      if ((res as http.Response).statusCode != 200) {
+        throw new StateError(res.body);
+      }
+      Map<String, String> params = Formler.parseUrlEncoded(res.body);
+      return new AuthorizationResponse.fromMap(params);
     });
-  }
-
-  /**
-   * Return Map object of parsed parameters from
-   * OAuth Service Provider Response Parameters.
-   */
-  static Map<String, String> _parseResponseParameters(String response) {
-    Map<String, String> result = new Map<String, String>();
-    response.split('&').forEach((p) {
-      Iterable keyValue = p.split('=');
-      result[keyValue.first] = keyValue.length > 1 ? keyValue.elementAt(1) : "";
-    });
-    return result;
   }
 }
