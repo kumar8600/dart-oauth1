@@ -2,6 +2,7 @@ library oauth1_client;
 
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:formler/formler.dart';
 
 import 'signature_method.dart';
 import 'client_credentials.dart';
@@ -37,7 +38,18 @@ class Client extends http.BaseClient {
     ahb.credentials = _credentials;
     ahb.method = request.method;
     ahb.url = request.url.toString();
-    ahb.additionalParameters = request.headers;
+    var headers = request.headers;
+    Map<String, String> additionalParameters = new Map<String, String>();
+    if (headers.containsKey('Authorization')) {
+      additionalParameters = Formler.parseUrlEncoded(headers['Authorization']);
+    }
+    if (headers.containsKey('content-type') &&
+        headers['content-type'] == 'application/x-www-form-urlencoded' &&
+        (request as http.Request).body != null) {
+      additionalParameters.addAll(Formler.parseUrlEncoded((request as http.Request).body));
+    }
+    ahb.additionalParameters = additionalParameters;
+
     request.headers['Authorization'] = ahb.build().toString();
     return _httpClient.send(request);
   }
