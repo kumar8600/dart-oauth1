@@ -38,6 +38,7 @@ class AuthorizationHeader {
    * You can add parameters by _authorizationHeader.
    * (You can override too but I don't recommend.)
    */
+  @override
   String toString() {
     Map<String, String> params = new Map();
 
@@ -69,6 +70,7 @@ class AuthorizationHeader {
     if (params.isEmpty) {
       throw new ArgumentError("params is empty.");
     }
+    Uri uri = Uri.parse(url);
 
     //
     // Collecting parameters
@@ -78,6 +80,9 @@ class AuthorizationHeader {
     //    that will be signed.
     Map<String, String> encodedParams = new Map<String, String>();
     params.forEach((k, v) {
+      encodedParams[Uri.encodeComponent(k)] = Uri.encodeComponent(v);
+    });
+    uri.queryParameters.forEach((k, v) {
       encodedParams[Uri.encodeComponent(k)] = Uri.encodeComponent(v);
     });
     params.remove("realm");
@@ -108,9 +113,9 @@ class AuthorizationHeader {
     // 2. Append the '&' character to the output string.
     base.write('&');
 
-    // 3. Percent encode the URL and append it to the
+    // 3. Percent encode the URL origin and path, and append it to the
     //    output string.
-    base.write(Uri.encodeComponent(url));
+    base.write(Uri.encodeComponent(uri.origin + uri.path));
 
     // 4. Append the '&' character to the output string.
     base.write('&');
