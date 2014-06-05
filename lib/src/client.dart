@@ -44,7 +44,7 @@ class Client extends http.BaseClient {
       additionalParameters = Formler.parseUrlEncoded(headers['Authorization']);
     }
     if (headers.containsKey('content-type') &&
-        headers['content-type'] == 'application/x-www-form-urlencoded' &&
+        headers['content-type'].contains('application/x-www-form-urlencoded') &&
         (request as http.Request).body != null) {
       additionalParameters.addAll(Formler.parseUrlEncoded((request as http.Request).body));
     }
