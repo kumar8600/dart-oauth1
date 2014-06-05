@@ -1,7 +1,9 @@
 library credentials;
 
+import 'dart:convert';
+
 /**
- * A class describing OAuth credentials except for client credentials.
+ * A class describing OAuth credentials except for client credential
  */
 class Credentials {
   final String _token;
@@ -17,11 +19,21 @@ class Credentials {
     }
     return new Credentials(parameters['oauth_token'], parameters['oauth_token_secret']);
   }
+  factory Credentials.fromJSON(String json) {
+    return new Credentials.fromMap(JSON.decode(json));
+  }
 
   String get token => _token;
   String get tokenSecret => _tokenSecret;
 
   String toString() {
     return 'oauth_token=$token&oauth_token_secret=$tokenSecret';
+  }
+
+  Map toJSON() {
+    return {
+      "oauth_token": token,
+      "oauth_token_secret": tokenSecret
+    };
   }
 }
