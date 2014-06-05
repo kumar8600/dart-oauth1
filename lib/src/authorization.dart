@@ -85,7 +85,7 @@ class Authorization {
     ahb.signatureMethod = _platform.signatureMethod;
     ahb.clientCredentials = _clientCredentials;
     ahb.credentials = tokenCredentials;
-    ahb.method = 'POS';
+    ahb.method = 'POST';
     ahb.url = _platform.tokenCredentialsRequestURI;
     ahb.additionalParameters = additionalParams;
 
