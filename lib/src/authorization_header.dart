@@ -1,6 +1,6 @@
 library authorization_header;
 
-import 'package:uuid/uuid_client.dart';
+import 'package:uuid/uuid.dart';
 
 import 'signature_method.dart';
 import 'client_credentials.dart';
