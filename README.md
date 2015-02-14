@@ -1,6 +1,8 @@
 dart-oauth1
 ===========
 
+[![Build Status](https://travis-ci.org/kumar8600/dart-oauth1.svg?branch=master)](https://travis-ci.org/kumar8600/dart-oauth1)
+
 "[RFC 5849: The OAuth 1.0 Protocol][rfc5849]" client implementation for dart
 
 Usage
