@@ -1,5 +1,6 @@
 library signature_method;
 
+import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
 typedef String Sign(String key, String text);
@@ -28,13 +29,13 @@ class SignatureMethod {
 abstract class SignatureMethods {
   /// http://tools.ietf.org/html/rfc5849#section-3.4.2
   static final SignatureMethod HMAC_SHA1 = new SignatureMethod("HMAC-SHA1", (key, text) {
-    HMAC hmac = new HMAC(new SHA1(), key.codeUnits);
-    hmac.add(text.codeUnits);
+    HMAC hmac = new Hmac(sha1, key.codeUnits);
+    List<int> bytes = hmac.convert(text.codeUnits).bytes;
 
     // The output of the HMAC signing function is a binary
     // string. This needs to be base64 encoded to produce
     // the signature string.
-    return CryptoUtils.bytesToBase64(hmac.close());
+    return BASE64.encode(bytes);
   });
 
   /// http://tools.ietf.org/html/rfc5849#section-3.4.3
