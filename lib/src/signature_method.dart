@@ -29,7 +29,7 @@ class SignatureMethod {
 abstract class SignatureMethods {
   /// http://tools.ietf.org/html/rfc5849#section-3.4.2
   static final SignatureMethod HMAC_SHA1 = new SignatureMethod("HMAC-SHA1", (key, text) {
-    HMAC hmac = new Hmac(sha1, key.codeUnits);
+    Hmac hmac = new Hmac(sha1, key.codeUnits);
     List<int> bytes = hmac.convert(text.codeUnits).bytes;
 
     // The output of the HMAC signing function is a binary
