@@ -77,7 +77,7 @@ class Authorization {
    * http://tools.ietf.org/html/rfc5849#section-2.3
    */
   Future<AuthorizationResponse> requestTokenCredentials(Credentials tokenCredentials, String verifier) {
-    MapMap<String, String> additionalParams = {
+    Map<String, String> additionalParams = {
       'oauth_verifier': verifier
     };
     var ahb = new AuthorizationHeaderBuilder();
