@@ -2,7 +2,6 @@ library authorization;
 
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:formler/formler.dart';
 
 import 'credentials.dart';
 import 'client_credentials.dart';
@@ -57,7 +56,7 @@ class Authorization {
       if ((res as http.Response).statusCode != 200) {
         throw new StateError(res.body);
       }
-      Map<String, String> params = Formler.parseUrlEncoded(res.body);
+      Map<String, String> params = Uri.splitQueryString(res.body);
       if (params['oauth_callback_confirmed'].toLowerCase() != 'true') {
         throw new StateError("oauth_callback_confirmed must be true");
       }
@@ -95,7 +94,7 @@ class Authorization {
       if ((res as http.Response).statusCode != 200) {
         throw new StateError(res.body);
       }
-      Map<String, String> params = Formler.parseUrlEncoded(res.body);
+      Map<String, String> params = Uri.splitQueryString(res.body);
       return new AuthorizationResponse.fromMap(params);
     });
   }
