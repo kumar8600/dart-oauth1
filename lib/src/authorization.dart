@@ -41,7 +41,7 @@ class Authorization {
     if (callbackURI == null) {
       callbackURI = 'oob';
     }
-    Map additionalParams = {
+    Map<String, String> additionalParams = {
       'oauth_callback': callbackURI
     };
     var ahb = new AuthorizationHeaderBuilder();
@@ -78,7 +78,7 @@ class Authorization {
    * http://tools.ietf.org/html/rfc5849#section-2.3
    */
   Future<AuthorizationResponse> requestTokenCredentials(Credentials tokenCredentials, String verifier) {
-    Map additionalParams = {
+    MapMap<String, String> additionalParams = {
       'oauth_verifier': verifier
     };
     var ahb = new AuthorizationHeaderBuilder();
